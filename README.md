@@ -14,4 +14,4 @@
 
 ## You can easily extend this functionality to get other things such as campaigns, adsets etc.
 
-The code will work for campaigns and adsets already, assuming you only need campaign/adset IDs and names. For other calls you will need to generate your own logic based on the sample above.
+The code will work for campaigns and adsets already, assuming you only need campaign/adset IDs and names. For other calls you will need to generate your own logic based on the samples above.
