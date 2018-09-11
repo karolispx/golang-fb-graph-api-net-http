@@ -1,9 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-
-	fb "github.com/huandu/facebook"
+	"io/ioutil"
+	"net/http"
 )
 
 const (
@@ -11,45 +12,49 @@ const (
 	FB_API_VERSION  = "v3.1"
 )
 
-func main() {
-	// Set up FB graphAPI version
-	fb.Version = FB_API_VERSION
+// Struct generated using https://mholt.github.io/json-to-go/
+type GraphAPIResponse struct {
+	Data []struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"data"`
+}
 
-	// Run the sync
+func main() {
 	printMessage("Getting accounts...")
 	getAccounts()
 }
 
 // Get accounts
 func getAccounts() {
-	// Make request to /me/adaccounts to get accounts
-	// Set your own limit or additioal parameters
-	res, _ := fb.Get("/me/adaccounts?limit=2", fb.Params{
-		"fields":       "id,name",
-		"access_token": FB_ACCESS_TOKEN,
-	})
+	// Make /me/adaccounts call to graphAPI
+	url := "https://graph.facebook.com/" + FB_API_VERSION + "/me/adaccounts?limit=500&fields=id,name&access_token=" + FB_ACCESS_TOKEN
 
-	var items []fb.Result
+	response, err := http.Get(url)
 
-	err := res.DecodeField("data", &items)
+	checkErr(err)
 
-	if err != nil {
-		// Error has happened when retrieving the data - repeat the call
-		printMessage("An error has occurred while getting accounts. Repeating the call...")
-		fmt.Printf("An error has happened %v", err)
+	defer response.Body.Close()
 
-		getAccounts()
-	} else {
-		// Accounts have been retrieved - save them to DB
-		printMessage("Accounts have been retrieved successfully.")
+	items := GraphAPIResponse{}
 
-		// For each item
-		for _, item := range items {
-			accountID := item["id"].(string)
-			accountName := item["name"].(string)
+	body, err := ioutil.ReadAll(response.Body)
 
-			fmt.Println("Account ID: " + accountID + ", account name: " + accountName)
-		}
+	checkErr(err)
+
+	err = json.Unmarshal(body, &items)
+
+	checkErr(err)
+
+	// Accounts have been retrieved - save them to DB
+	printMessage("Accounts have been retrieved successfully!")
+
+	// For each item
+	for _, item := range items.Data {
+		accountID := item.ID
+		accountName := item.Name
+
+		fmt.Println("Account ID: " + accountID + ", account name: " + accountName)
 	}
 }
 
