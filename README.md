@@ -3,9 +3,9 @@
 ## Code put together using net/http package:
 * https://golang.org/pkg/net/http/
 
-! You will need to initialize your own struct (GraphAPIResponse) for the reponse based on what you're expecting to get back.
+* You will need to initialize your own struct (GraphAPIResponse) for the reponse based on what you're expecting to get back.
 
-1. Use Graph API explorer to test Graph API to see what you need to retrieve, in my case it was accounts (/me/adaccounts?limit=500&fields=id,name)
+1. Use Graph API explorer (https://developers.facebook.com/tools/explorer/) to test Graph API to see what you need to retrieve, in my case it was accounts (/me/adaccounts?limit=500&fields=id,name)
 2. Click on `</> Get Code` and select cURL
 3. Run cURL command in the terminal
 4. Assuming data came back, copy everything starting with `{"data"` and ending with `}}}`
